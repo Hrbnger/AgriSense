@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Session } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Camera, Leaf, MessageSquare, CloudSun, User, LogOut } from "lucide-react";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Camera, Leaf, MessageSquare, CloudSun, User, LogOut, Settings, Menu } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
@@ -60,28 +61,28 @@ const Dashboard = () => {
       description: "Take or upload a photo to identify plants",
       icon: Leaf,
       color: "bg-primary",
-      action: () => toast({ title: "Coming soon!", description: "Plant identification feature is under development." }),
+      action: () => navigate("/identify-plant"),
     },
     {
       title: "Diagnose Disease",
       description: "Detect plant diseases from leaf images",
       icon: Camera,
       color: "bg-destructive",
-      action: () => toast({ title: "Coming soon!", description: "Disease diagnosis feature is under development." }),
+      action: () => navigate("/diagnose-disease"),
     },
     {
       title: "Community Forum",
       description: "Connect with other farmers",
       icon: MessageSquare,
       color: "bg-secondary",
-      action: () => toast({ title: "Coming soon!", description: "Forum feature is under development." }),
+      action: () => navigate("/forum"),
     },
     {
       title: "Weather & Tips",
       description: "Get localized farming advice",
       icon: CloudSun,
       color: "bg-accent",
-      action: () => toast({ title: "Coming soon!", description: "Weather feature is under development." }),
+      action: () => navigate("/weather"),
     },
   ];
 
@@ -100,14 +101,27 @@ const Dashboard = () => {
             </div>
             <h1 className="text-2xl font-bold">AgriSense</h1>
           </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" size="icon">
-              <User className="h-5 w-5" />
-            </Button>
-            <Button variant="ghost" size="icon" onClick={handleSignOut}>
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => navigate("/profile")}>
+                <User className="mr-2 h-4 w-4" />
+                Profile
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate("/settings")}>
+                <Settings className="mr-2 h-4 w-4" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleSignOut}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Sign Out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </header>
 
