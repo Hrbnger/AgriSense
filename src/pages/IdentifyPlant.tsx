@@ -3,11 +3,22 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Upload } from "lucide-react";
+import { ArrowLeft, Camera, Upload, Leaf, Droplet, Sun } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+
+interface IdentificationResult {
+  plantName: string;
+  scientificName: string;
+  plantType: string;
+  suitableEnvironment: string;
+  careInstructions: string;
+  confidence: number;
+}
 
 const IdentifyPlant = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [identifying, setIdentifying] = useState(false);
+  const [result, setResult] = useState<IdentificationResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -34,14 +45,36 @@ const IdentifyPlant = () => {
     }
 
     setIdentifying(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIdentifying(false);
+    setResult(null);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('identify-plant', {
+        body: { imageData: selectedImage }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setResult(data);
       toast({
         title: "Plant Identified!",
-        description: "This appears to be a common tomato plant",
+        description: `${data.plantName} identified with ${data.confidence}% confidence`,
       });
-    }, 2000);
+    } catch (error: any) {
+      console.error('Identification error:', error);
+      toast({
+        title: "Identification Failed",
+        description: error.message || "Failed to identify plant. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIdentifying(false);
+    }
   };
 
   return (
@@ -113,6 +146,54 @@ const IdentifyPlant = () => {
             >
               {identifying ? "Identifying..." : "Identify Plant"}
             </Button>
+
+            {result && (
+              <div className="mt-6 space-y-4">
+                <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Leaf className="h-5 w-5 text-primary" />
+                    <h3 className="font-semibold text-lg">{result.plantName}</h3>
+                  </div>
+                  <p className="text-sm text-muted-foreground italic">{result.scientificName}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <span className="text-xs font-medium px-2 py-1 bg-primary/10 rounded">
+                      {result.plantType}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Confidence: {result.confidence}%
+                    </span>
+                  </div>
+                </div>
+
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <Sun className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-lg">Suitable Environment</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      {result.suitableEnvironment}
+                    </p>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <div className="flex items-center gap-2">
+                      <Droplet className="h-5 w-5 text-primary" />
+                      <CardTitle className="text-lg">Care Instructions</CardTitle>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
+                      {result.careInstructions}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
