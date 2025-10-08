@@ -23,7 +23,7 @@ const Forum = () => {
   const fetchPosts = async () => {
     const { data } = await supabase
       .from("forum_posts")
-      .select("*, profiles(full_name)")
+      .select("*, public_profiles(full_name)")
       .order("created_at", { ascending: false })
       .limit(10);
 
@@ -112,7 +112,7 @@ const Forum = () => {
               <CardHeader>
                 <CardTitle className="text-lg">{post.title}</CardTitle>
                 <CardDescription>
-                  by {post.profiles?.full_name || "Anonymous"}
+                  by {post.public_profiles?.full_name || "Anonymous"}
                 </CardDescription>
               </CardHeader>
               <CardContent>
