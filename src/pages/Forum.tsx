@@ -83,30 +83,7 @@ const Forum = () => {
           Back
         </Button>
 
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>Create New Post</CardTitle>
-            <CardDescription>Share your farming questions or insights</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Input
-              placeholder="Post title"
-              value={newTitle}
-              onChange={(e) => setNewTitle(e.target.value)}
-            />
-            <Textarea
-              placeholder="What's on your mind?"
-              value={newContent}
-              onChange={(e) => setNewContent(e.target.value)}
-              rows={4}
-            />
-            <Button onClick={handleCreatePost} disabled={loading} className="w-full">
-              {loading ? "Posting..." : "Create Post"}
-            </Button>
-          </CardContent>
-        </Card>
-
-        <div className="space-y-4">
+        <div className="space-y-4 mb-6">
           {posts.map((post) => (
             <Card key={post.id}>
               <CardHeader>
@@ -131,6 +108,29 @@ const Forum = () => {
             </Card>
           ))}
         </div>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Create New Post</CardTitle>
+            <CardDescription>Share your farming questions or insights</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Input
+              placeholder="Post title"
+              value={newTitle}
+              onChange={(e) => setNewTitle(e.target.value)}
+            />
+            <Textarea
+              placeholder="What's on your mind?"
+              value={newContent}
+              onChange={(e) => setNewContent(e.target.value)}
+              rows={4}
+            />
+            <Button onClick={handleCreatePost} disabled={loading} className="w-full">
+              {loading ? "Posting..." : "Create Post"}
+            </Button>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
