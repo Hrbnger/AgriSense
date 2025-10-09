@@ -29,14 +29,14 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert botanist. Analyze plant images and provide detailed identification information including plant type, suitable environment, and care instructions. Return the response as JSON with fields: plantName, scientificName, plantType, suitableEnvironment, careInstructions, and confidence (0-100)."
+            content: "You are an expert botanist with extensive knowledge of plant identification. Carefully analyze the provided plant image, examining leaf shape, color, texture, growth pattern, and any visible flowers or fruits. Provide specific, accurate identification based on the unique visual characteristics you observe. Return the response as JSON with fields: plantName (specific common name), scientificName (Latin binomial), plantType (e.g., succulent, flowering plant, fern, tree), suitableEnvironment (detailed climate and light requirements), careInstructions (specific watering, soil, and maintenance needs), and confidence (0-100)."
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Identify this plant and provide detailed information about it."
+                text: "Carefully examine this specific plant image. Look at the unique characteristics: leaf shape, color, patterns, texture, size, growth habit, and any visible flowers, fruits, or distinctive features. Identify this exact plant species and provide detailed, specific information about this particular plant. Do not give generic information - focus on what you actually see in this image."
               },
               {
                 type: "image_url",

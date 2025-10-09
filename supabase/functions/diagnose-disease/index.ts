@@ -29,14 +29,14 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert plant pathologist. Analyze plant disease images and provide detailed diagnosis including disease name, severity, symptoms, treatment recommendations, and prevention methods. Return the response as JSON with fields: diseaseName, severity (mild/moderate/severe), symptoms, treatment, prevention, and confidence (0-100)."
+            content: "You are an expert plant pathologist with years of experience diagnosing plant diseases. Carefully examine the provided plant image, looking for specific symptoms like discoloration, spots, wilting, lesions, mold, pest damage, or abnormal growth patterns. Provide accurate diagnosis based on the exact visual symptoms you observe. Return the response as JSON with fields: diseaseName (specific disease or condition name), severity (mild/moderate/severe based on visible damage), symptoms (detailed description of what you see), treatment (specific actionable steps), prevention (specific preventive measures), and confidence (0-100)."
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Diagnose this plant disease and provide detailed treatment and prevention information."
+                text: "Carefully examine this specific plant disease image. Look at the exact symptoms visible: type and color of spots or lesions, pattern of discoloration, extent of damage, affected plant parts, and any visible pests or fungal growth. Diagnose the specific disease or condition affecting this plant based on what you actually observe in this image. Provide detailed, specific treatment recommendations for this exact condition. Do not give generic responses - analyze the unique symptoms you see."
               },
               {
                 type: "image_url",
