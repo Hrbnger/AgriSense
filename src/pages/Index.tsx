@@ -29,9 +29,11 @@ const Index = () => {
       {/* Hero Section */}
       <section className="gradient-hero py-20 px-4">
         <div className="container mx-auto text-center">
-          <div className="mx-auto w-20 h-20 bg-primary rounded-full flex items-center justify-center mb-6 animate-fade-in">
-            <Leaf className="w-12 h-12 text-primary-foreground" />
-          </div>
+          <img 
+            src="/app-icon.jpg" 
+            alt="AgriSense" 
+            className="mx-auto w-20 h-20 rounded-full object-cover mb-6 animate-fade-in shadow-lg" 
+          />
           <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in">
             AgriSense
           </h1>
@@ -107,8 +109,8 @@ const Index = () => {
             <div className="relative">
               <Card className="card-elevated">
                 <CardContent className="p-8">
-                  <div className="aspect-square bg-gradient-primary rounded-lg flex items-center justify-center">
-                    <Leaf className="w-24 h-24 text-white" />
+                  <div className="aspect-square rounded-lg flex items-center justify-center overflow-hidden">
+                    <img src="/app-icon.jpg" alt="AgriSense" className="w-full h-full object-cover" />
                   </div>
                 </CardContent>
               </Card>

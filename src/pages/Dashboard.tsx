@@ -96,9 +96,7 @@ const Dashboard = () => {
       <header className="border-b bg-card">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <Leaf className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img src="/app-icon.jpg" alt="AgriSense" className="w-10 h-10 rounded-full object-cover" />
             <h1 className="text-2xl font-bold">AgriSense</h1>
           </div>
           <DropdownMenu>
