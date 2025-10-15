@@ -1,14 +1,40 @@
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { ArrowLeft, Moon, Sun } from "lucide-react";
+import { Separator } from "@/components/ui/separator";
+import { ArrowLeft, Moon, Sun, Bell, MapPin, Palette, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useToast } from "@/hooks/use-toast";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const { toast } = useToast();
+  const [pushNotifications, setPushNotifications] = useState(false);
+  const [locationEnabled, setLocationEnabled] = useState(false);
+
+  const handlePushNotificationToggle = (checked: boolean) => {
+    setPushNotifications(checked);
+    toast({
+      title: checked ? "Notifications Enabled" : "Notifications Disabled",
+      description: checked 
+        ? "You'll receive push notifications for important updates" 
+        : "Push notifications have been turned off",
+    });
+  };
+
+  const handleLocationToggle = (checked: boolean) => {
+    setLocationEnabled(checked);
+    toast({
+      title: checked ? "Location Enabled" : "Location Disabled",
+      description: checked 
+        ? "Location services enabled for weather and maps" 
+        : "Location services have been disabled",
+    });
+  };
 
   return (
     <div className="min-h-screen bg-background p-4">
@@ -22,33 +48,139 @@ const Settings = () => {
           Back
         </Button>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Settings</CardTitle>
-            <CardDescription>Manage your app preferences</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="space-y-0.5">
-                <Label htmlFor="theme-toggle" className="text-base">
-                  Dark Mode
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  Toggle between light and dark theme
-                </p>
-              </div>
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+            <p className="text-muted-foreground mt-2">Manage your app preferences and privacy</p>
+          </div>
+
+          {/* Notifications Section */}
+          <Card>
+            <CardHeader>
               <div className="flex items-center gap-2">
-                <Sun className="h-4 w-4" />
-                <Switch
-                  id="theme-toggle"
-                  checked={theme === "dark"}
-                  onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
-                />
-                <Moon className="h-4 w-4" />
+                <Bell className="h-5 w-5 text-primary" />
+                <CardTitle>Notifications</CardTitle>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+              <CardDescription>Configure your notification preferences</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="push-notifications" className="text-base">
+                    Push Notifications
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Receive alerts for weather updates and disease warnings
+                  </p>
+                </div>
+                <Switch
+                  id="push-notifications"
+                  checked={pushNotifications}
+                  onCheckedChange={handlePushNotificationToggle}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Location Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <MapPin className="h-5 w-5 text-primary" />
+                <CardTitle>Location</CardTitle>
+              </div>
+              <CardDescription>Manage location services for weather and maps</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="location-services" className="text-base">
+                    Location Services
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Enable Google Maps integration and location-based features
+                  </p>
+                </div>
+                <Switch
+                  id="location-services"
+                  checked={locationEnabled}
+                  onCheckedChange={handleLocationToggle}
+                />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Appearance Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <Palette className="h-5 w-5 text-primary" />
+                <CardTitle>Appearance</CardTitle>
+              </div>
+              <CardDescription>Customize the look and feel of the app</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <Label htmlFor="theme-toggle" className="text-base">
+                    Theme
+                  </Label>
+                  <p className="text-sm text-muted-foreground">
+                    Toggle between light and dark mode
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Sun className="h-4 w-4 text-muted-foreground" />
+                  <Switch
+                    id="theme-toggle"
+                    checked={theme === "dark"}
+                    onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                  />
+                  <Moon className="h-4 w-4 text-muted-foreground" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Privacy Policy Section */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <CardTitle>Privacy & Legal</CardTitle>
+              </div>
+              <CardDescription>Review our policies and terms</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <a href="#" onClick={(e) => {
+                    e.preventDefault();
+                    toast({
+                      title: "Privacy Policy",
+                      description: "Privacy policy details will be displayed here",
+                    });
+                  }}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Privacy Policy
+                  </a>
+                </Button>
+                <Button variant="outline" className="w-full justify-start" asChild>
+                  <a href="#" onClick={(e) => {
+                    e.preventDefault();
+                    toast({
+                      title: "Terms of Service",
+                      description: "Terms of service will be displayed here",
+                    });
+                  }}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Terms of Service
+                  </a>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );
