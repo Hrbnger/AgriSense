@@ -1,6 +1,6 @@
 {
   "name": "AgriSense",
-  homepage:"https://hrbnger.github.io/AgriSense/"
+  "homepage":"https://hrbnger.github.io/AgriSense/",
   "private": true,
   "version": "0.0.0",
   "type": "module",
