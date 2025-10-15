@@ -3,15 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <title>404</title>
-    <meta http-equiv="refresh" content="0; url=/AgriSense/" />
     <script>
       (function() {
-        var redirect = '/AgriSense/' + (location.pathname + location.search + location.hash).replace(/^\/?AgriSense\/?/, '');
-        window.location.replace(redirect);
+        // For SPAs, redirect 404s to index.html with the path preserved
+        var path = window.location.pathname + window.location.search + window.location.hash;
+        window.location.replace('/' + path.replace(/^\//, ''));
       })();
     </script>
   </head>
   <body></body>
-  </html>
-
-
+</html>
