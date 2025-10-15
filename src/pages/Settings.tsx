@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Moon, Sun, Bell, MapPin, Palette, FileText } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 const Settings = () => {
   const navigate = useNavigate();
@@ -15,6 +16,27 @@ const Settings = () => {
   const { toast } = useToast();
   const [pushNotifications, setPushNotifications] = useState(false);
   const [locationEnabled, setLocationEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  const loadSettings = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('location')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      // If user has a location saved, they've enabled location services
+      if (data?.location) {
+        setLocationEnabled(true);
+      }
+    }
+  };
 
   const handlePushNotificationToggle = (checked: boolean) => {
     setPushNotifications(checked);
@@ -26,14 +48,114 @@ const Settings = () => {
     });
   };
 
-  const handleLocationToggle = (checked: boolean) => {
-    setLocationEnabled(checked);
-    toast({
-      title: checked ? "Location Enabled" : "Location Disabled",
-      description: checked 
-        ? "Location services enabled for weather and maps" 
-        : "Location services have been disabled",
-    });
+  const handleLocationToggle = async (checked: boolean) => {
+    if (!checked) {
+      // User is turning location OFF
+      setLocationEnabled(false);
+      
+      // Clear location from profile
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase
+          .from('profiles')
+          .update({ location: null })
+          .eq('user_id', user.id);
+      }
+      
+      toast({
+        title: "Location Disabled",
+        description: "Location services have been disabled",
+      });
+      return;
+    }
+
+    // User is turning location ON - request permission
+    setLoading(true);
+
+    if (!navigator.geolocation) {
+      toast({
+        title: "Location Not Supported",
+        description: "Your browser doesn't support location services",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    // Request location permission
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude, longitude } = position.coords;
+        
+        try {
+          // Get location name using reverse geocoding
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
+          );
+          const data = await response.json();
+          
+          const locationName = data.address.city || 
+                              data.address.town || 
+                              data.address.village || 
+                              data.address.county || 
+                              data.address.state || 
+                              "Unknown Location";
+          
+          const fullLocation = `${locationName}, ${data.address.country || ''}`;
+          
+          // Save location to profile
+          const { data: { user } } = await supabase.auth.getUser();
+          if (user) {
+            await supabase
+              .from('profiles')
+              .update({ location: fullLocation })
+              .eq('user_id', user.id);
+          }
+          
+          setLocationEnabled(true);
+          toast({
+            title: "Location Enabled",
+            description: `Location set to ${fullLocation}. Weather will now show data for your current location.`,
+          });
+        } catch (error) {
+          console.error("Failed to get location name:", error);
+          setLocationEnabled(true);
+          toast({
+            title: "Location Enabled",
+            description: "Location services enabled. Weather will use your current location.",
+          });
+        }
+        setLoading(false);
+      },
+      (error) => {
+        let errorMessage = "Failed to get your location";
+        
+        switch (error.code) {
+          case error.PERMISSION_DENIED:
+            errorMessage = "Location permission denied. Please enable location access in your browser settings.";
+            break;
+          case error.POSITION_UNAVAILABLE:
+            errorMessage = "Location information is unavailable.";
+            break;
+          case error.TIMEOUT:
+            errorMessage = "Location request timed out.";
+            break;
+        }
+        
+        toast({
+          title: "Location Access Required",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        setLocationEnabled(false);
+        setLoading(false);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0
+      }
+    );
   };
 
   return (
@@ -98,13 +220,14 @@ const Settings = () => {
                     Location Services
                   </Label>
                   <p className="text-sm text-muted-foreground">
-                    Enable Google Maps integration and location-based features
+                    Allow location access for weather forecasts and location-based features. When enabled, you'll see a browser popup requesting permission.
                   </p>
                 </div>
                 <Switch
                   id="location-services"
                   checked={locationEnabled}
                   onCheckedChange={handleLocationToggle}
+                  disabled={loading}
                 />
               </div>
             </CardContent>
