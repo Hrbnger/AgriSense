@@ -432,13 +432,18 @@ const Forum = () => {
         </div>
 
         {/* Create Post Section */}
-        <Card className="border-primary/20">
+        <Card className="border-primary/20 bg-primary/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Send className="h-5 w-5 text-primary" />
               Create New Post
             </CardTitle>
-            <CardDescription>Share your farming questions or insights with the community</CardDescription>
+            <CardDescription>
+              Share your farming questions or insights with the community. 
+              {!currentUserId && (
+                <span className="text-orange-600 font-medium"> Sign in to post!</span>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
@@ -447,25 +452,34 @@ const Forum = () => {
                 value={newTitle}
                 onChange={(e) => setNewTitle(e.target.value)}
                 className="text-base"
+                disabled={!currentUserId}
               />
             </div>
             <div>
               <Textarea
-                placeholder="What's on your mind? Share your thoughts, questions, or farming tips..."
+                placeholder={currentUserId ? "What's on your mind? Share your thoughts, questions, or farming tips..." : "Please sign in to create posts..."}
                 value={newContent}
                 onChange={(e) => setNewContent(e.target.value)}
                 rows={6}
                 className="resize-none"
+                disabled={!currentUserId}
               />
             </div>
             <Button 
               onClick={handleCreatePost} 
-              disabled={loading}
+              disabled={loading || !currentUserId}
               size="lg"
               className="w-full"
             >
-              {loading ? "Posting..." : "Publish Post"}
+              {loading ? "Posting..." : currentUserId ? "Publish Post" : "Sign In to Post"}
             </Button>
+            {!currentUserId && (
+              <p className="text-sm text-muted-foreground text-center">
+                <Button variant="link" onClick={() => navigate("/auth")} className="p-0 h-auto">
+                  Click here to sign in
+                </Button>
+              </p>
+            )}
           </CardContent>
         </Card>
 

@@ -8,18 +8,54 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY |
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-// Create a lazy-initialized Supabase client to avoid build-time issues
+// Create a robust Supabase client that handles both build-time and runtime
 let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
 
 const getSupabaseClient = () => {
-  if (!supabaseInstance && typeof window !== 'undefined') {
-    supabaseInstance = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      auth: {
-        storage: window.localStorage,
-        persistSession: true,
-        autoRefreshToken: true,
-      }
-    });
+  if (!supabaseInstance) {
+    // Only create client if we have valid credentials
+    if (SUPABASE_URL && SUPABASE_PUBLISHABLE_KEY && 
+        SUPABASE_URL !== 'https://placeholder.supabase.co' && 
+        SUPABASE_PUBLISHABLE_KEY !== 'placeholder-key') {
+      
+      supabaseInstance = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: {
+          storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+          persistSession: typeof window !== 'undefined',
+          autoRefreshToken: typeof window !== 'undefined',
+        }
+      });
+    } else {
+      // Return a mock client for development/testing
+      console.warn('Supabase credentials not found, using mock client');
+      supabaseInstance = {
+        auth: {
+          getUser: () => Promise.resolve({ data: { user: null }, error: null }),
+          getSession: () => Promise.resolve({ data: { session: null }, error: null }),
+          onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
+          signOut: () => Promise.resolve({ error: null }),
+          signUp: () => Promise.resolve({ error: null }),
+          signInWithPassword: () => Promise.resolve({ error: null }),
+        },
+        from: () => ({
+          select: () => ({
+            eq: () => ({
+              maybeSingle: () => Promise.resolve({ data: null, error: null }),
+              single: () => Promise.resolve({ data: null, error: null }),
+            }),
+            order: () => Promise.resolve({ data: [], error: null }),
+            in: () => Promise.resolve({ data: [], error: null }),
+          }),
+          insert: () => Promise.resolve({ data: null, error: null }),
+          update: () => Promise.resolve({ data: null, error: null }),
+          delete: () => Promise.resolve({ data: null, error: null }),
+        }),
+        channel: () => ({
+          on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
+        }),
+        removeChannel: () => {},
+      } as any;
+    }
   }
   return supabaseInstance;
 };
