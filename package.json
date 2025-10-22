@@ -4,7 +4,7 @@
   "description": "An intelligent agricultural platform for plant identification, disease diagnosis, and farming insights",
   "author": "Your Name",
   "license": "MIT",
-  "homepage": "https://Hrbnger.github.io/AgriSense/",
+  "homepage": "https://hrbnger.github.io/AgriSense/",
   "type": "module",
   "scripts": {
     "dev": "vite",
