@@ -5,9 +5,11 @@
     <title>404</title>
     <script>
       (function() {
-        // For SPAs, redirect 404s to index.html with the path preserved
+        // For SPAs on GitHub Pages with subdirectory, redirect 404s to index.html
         var path = window.location.pathname + window.location.search + window.location.hash;
-        window.location.replace('/' + path.replace(/^\//, ''));
+        // Remove the /AgriSense prefix if present and redirect to index.html
+        var cleanPath = path.replace(/^\/AgriSense/, '');
+        window.location.replace('/AgriSense/' + cleanPath.replace(/^\//, ''));
       })();
     </script>
   </head>
