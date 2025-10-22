@@ -21530,14 +21530,16 @@ const SUPABASE_URL = "https://ggktiwtwudznpvgjcwyi.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdna3Rpd3R3dWR6bnB2Z2pjd3lpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExNDc5MzcsImV4cCI6MjA3NjcyMzkzN30.3ZDeAL3M190Xfsiqc5xfzKCS_MrQk9TdUXWVu8XO5AU";
 let supabaseInstance = null;
 const getSupabaseClient = () => {
-  if (!supabaseInstance && typeof window !== "undefined") {
-    supabaseInstance = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-      auth: {
-        storage: window.localStorage,
-        persistSession: true,
-        autoRefreshToken: true
-      }
-    });
+  if (!supabaseInstance) {
+    {
+      supabaseInstance = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+        auth: {
+          storage: typeof window !== "undefined" ? window.localStorage : void 0,
+          persistSession: typeof window !== "undefined",
+          autoRefreshToken: typeof window !== "undefined"
+        }
+      });
+    }
   }
   return supabaseInstance;
 };
@@ -27246,13 +27248,16 @@ const Forum = () => {
         ] })
       ] })
     ] }, post.id)) }),
-    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-primary/20", children: [
+    /* @__PURE__ */ jsxRuntimeExports.jsxs(Card, { className: "border-primary/20 bg-primary/5", children: [
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardHeader, { children: [
         /* @__PURE__ */ jsxRuntimeExports.jsxs(CardTitle, { className: "flex items-center gap-2", children: [
           /* @__PURE__ */ jsxRuntimeExports.jsx(Send, { className: "h-5 w-5 text-primary" }),
           "Create New Post"
         ] }),
-        /* @__PURE__ */ jsxRuntimeExports.jsx(CardDescription, { children: "Share your farming questions or insights with the community" })
+        /* @__PURE__ */ jsxRuntimeExports.jsxs(CardDescription, { children: [
+          "Share your farming questions or insights with the community.",
+          !currentUserId && /* @__PURE__ */ jsxRuntimeExports.jsx("span", { className: "text-orange-600 font-medium", children: " Sign in to post!" })
+        ] })
       ] }),
       /* @__PURE__ */ jsxRuntimeExports.jsxs(CardContent, { className: "space-y-4", children: [
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
@@ -27261,29 +27266,32 @@ const Forum = () => {
             placeholder: "Post title",
             value: newTitle,
             onChange: (e) => setNewTitle(e.target.value),
-            className: "text-base"
+            className: "text-base",
+            disabled: !currentUserId
           }
         ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx("div", { children: /* @__PURE__ */ jsxRuntimeExports.jsx(
           Textarea,
           {
-            placeholder: "What's on your mind? Share your thoughts, questions, or farming tips...",
+            placeholder: currentUserId ? "What's on your mind? Share your thoughts, questions, or farming tips..." : "Please sign in to create posts...",
             value: newContent,
             onChange: (e) => setNewContent(e.target.value),
             rows: 6,
-            className: "resize-none"
+            className: "resize-none",
+            disabled: !currentUserId
           }
         ) }),
         /* @__PURE__ */ jsxRuntimeExports.jsx(
           Button,
           {
             onClick: handleCreatePost,
-            disabled: loading,
+            disabled: loading || !currentUserId,
             size: "lg",
             className: "w-full",
-            children: loading ? "Posting..." : "Publish Post"
+            children: loading ? "Posting..." : currentUserId ? "Publish Post" : "Sign In to Post"
           }
-        )
+        ),
+        !currentUserId && /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-sm text-muted-foreground text-center", children: /* @__PURE__ */ jsxRuntimeExports.jsx(Button, { variant: "link", onClick: () => navigate("/auth"), className: "p-0 h-auto", children: "Click here to sign in" }) })
       ] })
     ] }),
     /* @__PURE__ */ jsxRuntimeExports.jsx("div", { className: "text-center py-8 mt-12", children: /* @__PURE__ */ jsxRuntimeExports.jsx("p", { className: "text-muted-foreground text-lg", children: "Join the conversation. Find a community." }) })
