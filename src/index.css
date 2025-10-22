@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Earth-tone color palette for AgriSense */
+    --background: 42 21% 96%;
+    --foreground: 30 10% 15%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 30 10% 15%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 30 10% 15%;
+    
+    /* Primary: Rich Green */
+    --primary: 142 71% 45%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 142 71% 55%;
+    
+    /* Secondary: Warm Brown */
+    --secondary: 25 35% 45%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Muted: Light Beige */
+    --muted: 42 35% 94%;
+    --muted-foreground: 30 15% 40%;
+    
+    /* Accent: Golden Yellow */
+    --accent: 45 95% 60%;
+    --accent-foreground: 30 10% 15%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 42 20% 88%;
+    --input: 42 20% 88%;
+    --ring: 142 71% 45%;
+    
+    --radius: 0.75rem;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(142 71% 45%), hsl(45 95% 60%));
+    --gradient-hero: linear-gradient(180deg, hsl(142 71% 98%), hsl(42 35% 94%));
+    
+    /* Shadows */
+    --shadow-soft: 0 2px 8px -2px hsl(142 71% 45% / 0.1);
+    --shadow-elevated: 0 10px 30px -10px hsl(142 71% 45% / 0.2);
+    
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .dark {
+    --background: 30 15% 8%;
+    --foreground: 42 20% 95%;
+    
+    --card: 30 12% 12%;
+    --card-foreground: 42 20% 95%;
+    
+    --popover: 30 12% 12%;
+    --popover-foreground: 42 20% 95%;
+    
+    --primary: 142 65% 50%;
+    --primary-foreground: 30 15% 8%;
+    --primary-glow: 142 65% 60%;
+    
+    --secondary: 25 30% 35%;
+    --secondary-foreground: 42 20% 95%;
+    
+    --muted: 30 12% 18%;
+    --muted-foreground: 42 15% 65%;
+    
+    --accent: 45 90% 55%;
+    --accent-foreground: 30 15% 8%;
+    
+    --destructive: 0 80% 55%;
+    --destructive-foreground: 42 20% 95%;
+    
+    --border: 30 12% 22%;
+    --input: 30 12% 22%;
+    --ring: 142 65% 50%;
+    
+    --shadow-soft: 0 2px 8px -2px hsl(0 0% 0% / 0.3);
+    --shadow-elevated: 0 10px 30px -10px hsl(0 0% 0% / 0.5);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .card-elevated {
+    box-shadow: var(--shadow-elevated);
+  }
+  
+  .gradient-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.6s ease-in;
+  }
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
