@@ -17,15 +17,7 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     target: 'esnext',
-    minify: 'esbuild',
+    minify: false,
     sourcemap: false,
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom'],
-          supabase: ['@supabase/supabase-js'],
-        },
-      },
-    },
   },
 }));
