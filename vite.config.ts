@@ -19,6 +19,7 @@ export default defineConfig(({ mode }) => ({
     target: 'esnext',
     minify: false,
     sourcemap: false,
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         entryFileNames: 'assets/[name]-[hash].js',
