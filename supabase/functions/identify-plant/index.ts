@@ -21,7 +21,11 @@ serve(async (req) => {
     // Extract base64 data from data URL
     const base64Data = imageData.split(',')[1];
 
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${GEMINI_API_KEY}`, {
+    console.log("Making Gemini API call...");
+    console.log("API Key exists:", !!GEMINI_API_KEY);
+    console.log("Base64 data length:", base64Data.length);
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -31,7 +35,7 @@ serve(async (req) => {
           {
             parts: [
               {
-                text: "You are an expert botanist with extensive knowledge of plant identification. Carefully analyze the provided plant image, examining leaf shape, color, texture, growth pattern, flowers, fruits, bark, and any distinctive features. Provide comprehensive identification with detailed botanical information. Return the response as JSON with fields: plantName (specific common name), scientificName (Latin binomial), plantType (e.g., succulent, flowering plant, fern, tree, shrub), family (botanical family), origin (native region), suitableEnvironment (detailed climate, light, temperature requirements), careInstructions (specific watering, soil, fertilizing, pruning needs), growthHabit (size, shape, growth pattern), floweringSeason (when it blooms), toxicity (if poisonous to humans/pets), uses (medicinal, culinary, ornamental), propagation (how to propagate), commonProblems (pests, diseases, issues), and confidence (0-100)."
+                text: "You are an expert botanist. Analyze this plant image and return ONLY a JSON object with these exact fields: plantName, scientificName, plantType, family, origin, suitableEnvironment, careInstructions, growthHabit, floweringSeason, toxicity, uses, propagation, commonProblems, confidence (0-100). Be specific and detailed."
               },
               {
                 inline_data: {
@@ -41,27 +45,40 @@ serve(async (req) => {
               }
             ]
           }
-        ]
+        ],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 1000,
+        }
       }),
     });
 
+    console.log("Gemini API response status:", response.status);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error("Gemini API error:", response.status, errorText);
+      
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      if (response.status === 400) {
         return new Response(
-          JSON.stringify({ error: "AI credits depleted. Please add credits to continue." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: `Bad request: ${errorText}` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
+      if (response.status === 403) {
+        return new Response(
+          JSON.stringify({ error: "API key invalid or insufficient permissions" }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
       return new Response(
-        JSON.stringify({ error: "AI service error" }),
+        JSON.stringify({ error: `AI service error: ${response.status} - ${errorText}` }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
