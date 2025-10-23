@@ -125,9 +125,15 @@ const IdentifyPlant = () => {
       }
 
       setResult(data);
+      
+      // Check if we're using mock data
+      const isMockData = data.plantName === "Sample Plant";
+      
       toast({
-        title: "Plant Identified!",
-        description: `${data.plantName} identified with ${data.confidence}% confidence`,
+        title: isMockData ? "Demo Mode - Plant Identified!" : "Plant Identified!",
+        description: isMockData 
+          ? "Using demo data. Configure Supabase for real AI analysis."
+          : `${data.plantName} identified with ${data.confidence}% confidence`,
       });
     } catch (error: any) {
       console.error('Identification error:', error);
@@ -157,6 +163,15 @@ const IdentifyPlant = () => {
           <CardHeader>
             <CardTitle>Identify Plant</CardTitle>
             <CardDescription>Take or upload a photo to identify plants</CardDescription>
+            <div className="mt-2 p-3 bg-yellow-50 dark:bg-yellow-950/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+              <div className="flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                <span className="text-sm font-medium text-yellow-800 dark:text-yellow-200">Demo Mode</span>
+              </div>
+              <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+                Currently using demo data. To enable real AI plant identification, configure Supabase credentials.
+              </p>
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <input

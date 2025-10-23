@@ -50,6 +50,50 @@ const getSupabaseClient = () => {
           update: () => Promise.resolve({ data: null, error: null }),
           delete: () => Promise.resolve({ data: null, error: null }),
         }),
+        functions: {
+          invoke: async (functionName: string, options?: any) => {
+            console.warn(`Mock Supabase function call: ${functionName}`);
+            // Return a mock response for plant identification
+            if (functionName === 'identify-plant') {
+              return {
+                data: {
+                  plantName: "Sample Plant",
+                  scientificName: "Plantus sampleus",
+                  plantType: "Houseplant",
+                  family: "Plantaceae",
+                  origin: "Tropical regions",
+                  suitableEnvironment: "Bright indirect light, warm temperatures, high humidity",
+                  careInstructions: "Water when soil is dry, fertilize monthly during growing season",
+                  growthHabit: "Upright, bushy growth reaching 2-3 feet tall",
+                  floweringSeason: "Spring to summer",
+                  toxicity: "Non-toxic to humans and pets",
+                  uses: "Ornamental houseplant, air purification",
+                  propagation: "Stem cuttings in water or soil",
+                  commonProblems: "Overwatering, spider mites, leaf drop",
+                  confidence: 85
+                },
+                error: null
+              };
+            }
+            if (functionName === 'diagnose-disease') {
+              return {
+                data: {
+                  diseaseName: "Sample Disease",
+                  severity: "mild",
+                  symptoms: "Yellowing leaves, brown spots",
+                  treatment: "Remove affected leaves, improve air circulation",
+                  prevention: "Avoid overwatering, ensure proper drainage",
+                  confidence: 75
+                },
+                error: null
+              };
+            }
+            return {
+              data: null,
+              error: { message: "Mock Supabase function - please configure real Supabase credentials" }
+            };
+          }
+        },
         channel: () => ({
           on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
         }),
