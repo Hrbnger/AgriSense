@@ -12,41 +12,36 @@ serve(async (req) => {
 
   try {
     const { imageData } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Extract base64 data from data URL
+    const base64Data = imageData.split(',')[1];
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+        contents: [
           {
-            role: "system",
-            content: "You are an expert plant pathologist with years of experience diagnosing plant diseases. Carefully examine the provided plant image, looking for specific symptoms like discoloration, spots, wilting, lesions, mold, pest damage, or abnormal growth patterns. Provide accurate diagnosis based on the exact visual symptoms you observe. Return the response as JSON with fields: diseaseName (specific disease or condition name), severity (mild/moderate/severe based on visible damage), symptoms (detailed description of what you see), treatment (specific actionable steps), prevention (specific preventive measures), and confidence (0-100)."
-          },
-          {
-            role: "user",
-            content: [
+            parts: [
               {
-                type: "text",
-                text: "Carefully examine this specific plant disease image. Look at the exact symptoms visible: type and color of spots or lesions, pattern of discoloration, extent of damage, affected plant parts, and any visible pests or fungal growth. Diagnose the specific disease or condition affecting this plant based on what you actually observe in this image. Provide detailed, specific treatment recommendations for this exact condition. Do not give generic responses - analyze the unique symptoms you see."
+                text: "You are an expert plant pathologist with years of experience diagnosing plant diseases. Carefully examine the provided plant image, looking for specific symptoms like discoloration, spots, wilting, lesions, mold, pest damage, or abnormal growth patterns. Provide accurate diagnosis based on the exact visual symptoms you observe. Return the response as JSON with fields: diseaseName (specific disease or condition name), severity (mild/moderate/severe based on visible damage), symptoms (detailed description of what you see), treatment (specific actionable steps), prevention (specific preventive measures), and confidence (0-100)."
               },
               {
-                type: "image_url",
-                image_url: {
-                  url: imageData
+                inline_data: {
+                  mime_type: "image/jpeg",
+                  data: base64Data
                 }
               }
             ]
           }
-        ],
+        ]
       }),
     });
 
@@ -72,7 +67,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const aiResponse = data.choices?.[0]?.message?.content;
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     // Parse JSON from AI response
     let result;

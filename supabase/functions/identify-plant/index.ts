@@ -12,41 +12,36 @@ serve(async (req) => {
 
   try {
     const { imageData } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     
-    if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+    if (!GEMINI_API_KEY) {
+      throw new Error("GEMINI_API_KEY is not configured");
     }
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Extract base64 data from data URL
+    const base64Data = imageData.split(',')[1];
+
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=${GEMINI_API_KEY}`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
+        contents: [
           {
-            role: "system",
-            content: "You are an expert botanist with extensive knowledge of plant identification. Carefully analyze the provided plant image, examining leaf shape, color, texture, growth pattern, flowers, fruits, bark, and any distinctive features. Provide comprehensive identification with detailed botanical information. Return the response as JSON with fields: plantName (specific common name), scientificName (Latin binomial), plantType (e.g., succulent, flowering plant, fern, tree, shrub), family (botanical family), origin (native region), suitableEnvironment (detailed climate, light, temperature requirements), careInstructions (specific watering, soil, fertilizing, pruning needs), growthHabit (size, shape, growth pattern), floweringSeason (when it blooms), toxicity (if poisonous to humans/pets), uses (medicinal, culinary, ornamental), propagation (how to propagate), commonProblems (pests, diseases, issues), and confidence (0-100)."
-          },
-          {
-            role: "user",
-            content: [
+            parts: [
               {
-                type: "text",
-                text: "Carefully examine this specific plant image. Analyze all visible characteristics: leaf shape, size, color, texture, arrangement, margins, veins, growth pattern, stem/bark appearance, flowers, fruits, and any distinctive features. Identify this exact plant species and provide comprehensive botanical information including its family, origin, growth habits, care requirements, flowering season, toxicity, uses, propagation methods, and common problems. Be specific and detailed - focus on what you actually observe in this image."
+                text: "You are an expert botanist with extensive knowledge of plant identification. Carefully analyze the provided plant image, examining leaf shape, color, texture, growth pattern, flowers, fruits, bark, and any distinctive features. Provide comprehensive identification with detailed botanical information. Return the response as JSON with fields: plantName (specific common name), scientificName (Latin binomial), plantType (e.g., succulent, flowering plant, fern, tree, shrub), family (botanical family), origin (native region), suitableEnvironment (detailed climate, light, temperature requirements), careInstructions (specific watering, soil, fertilizing, pruning needs), growthHabit (size, shape, growth pattern), floweringSeason (when it blooms), toxicity (if poisonous to humans/pets), uses (medicinal, culinary, ornamental), propagation (how to propagate), commonProblems (pests, diseases, issues), and confidence (0-100)."
               },
               {
-                type: "image_url",
-                image_url: {
-                  url: imageData
+                inline_data: {
+                  mime_type: "image/jpeg",
+                  data: base64Data
                 }
               }
             ]
           }
-        ],
+        ]
       }),
     });
 
@@ -72,7 +67,7 @@ serve(async (req) => {
     }
 
     const data = await response.json();
-    const aiResponse = data.choices?.[0]?.message?.content;
+    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     // Parse JSON from AI response
     let result;
