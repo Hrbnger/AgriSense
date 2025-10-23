@@ -3,15 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Camera, Upload, Leaf, Droplet, Sun, X } from "lucide-react";
+import { ArrowLeft, Camera, Upload, Leaf, Droplet, Sun, X, Globe, Calendar, AlertTriangle, Heart, Sprout, Bug } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface IdentificationResult {
   plantName: string;
   scientificName: string;
   plantType: string;
+  family: string;
+  origin: string;
   suitableEnvironment: string;
   careInstructions: string;
+  growthHabit: string;
+  floweringSeason: string;
+  toxicity: string;
+  uses: string;
+  propagation: string;
+  commonProblems: string;
   confidence: number;
 }
 
@@ -232,15 +240,19 @@ const IdentifyPlant = () => {
 
             {result && (
               <div className="mt-6 space-y-4">
+                {/* Main Plant Info */}
                 <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
                   <div className="flex items-center gap-2 mb-2">
                     <Leaf className="h-5 w-5 text-primary" />
                     <h3 className="font-semibold text-lg">{result.plantName}</h3>
                   </div>
-                  <p className="text-sm text-muted-foreground italic">{result.scientificName}</p>
-                  <div className="mt-2 flex items-center gap-2">
+                  <p className="text-sm text-muted-foreground italic mb-2">{result.scientificName}</p>
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
                     <span className="text-xs font-medium px-2 py-1 bg-primary/10 rounded">
                       {result.plantType}
+                    </span>
+                    <span className="text-xs font-medium px-2 py-1 bg-blue-100 dark:bg-blue-900/20 rounded">
+                      {result.family}
                     </span>
                     <span className="text-xs text-muted-foreground">
                       Confidence: {result.confidence}%
@@ -248,6 +260,43 @@ const IdentifyPlant = () => {
                   </div>
                 </div>
 
+                {/* Basic Information Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Globe className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">Origin & Family</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div>
+                          <span className="text-sm font-medium">Family:</span>
+                          <p className="text-sm text-muted-foreground">{result.family}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm font-medium">Native Region:</span>
+                          <p className="text-sm text-muted-foreground">{result.origin}</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Sprout className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">Growth Habit</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.growthHabit}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Environment & Care */}
                 <Card>
                   <CardHeader>
                     <div className="flex items-center gap-2">
@@ -275,6 +324,75 @@ const IdentifyPlant = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Flowering & Uses */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">Flowering Season</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.floweringSeason}</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Heart className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">Uses</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.uses}</p>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Toxicity Warning */}
+                {result.toxicity && result.toxicity !== "Unknown" && result.toxicity.toLowerCase().includes("toxic") && (
+                  <Card className="border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-800">
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5 text-red-600" />
+                        <CardTitle className="text-lg text-red-800 dark:text-red-200">Toxicity Warning</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-red-700 dark:text-red-300">{result.toxicity}</p>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Propagation & Problems */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Sprout className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">Propagation</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.propagation}</p>
+                    </CardContent>
+                  </Card>
+
+                  <Card>
+                    <CardHeader>
+                      <div className="flex items-center gap-2">
+                        <Bug className="h-5 w-5 text-primary" />
+                        <CardTitle className="text-lg">Common Problems</CardTitle>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm text-muted-foreground">{result.commonProblems}</p>
+                    </CardContent>
+                  </Card>
+                </div>
               </div>
             )}
           </CardContent>

@@ -29,14 +29,14 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert botanist with extensive knowledge of plant identification. Carefully analyze the provided plant image, examining leaf shape, color, texture, growth pattern, and any visible flowers or fruits. Provide specific, accurate identification based on the unique visual characteristics you observe. Return the response as JSON with fields: plantName (specific common name), scientificName (Latin binomial), plantType (e.g., succulent, flowering plant, fern, tree), suitableEnvironment (detailed climate and light requirements), careInstructions (specific watering, soil, and maintenance needs), and confidence (0-100)."
+            content: "You are an expert botanist with extensive knowledge of plant identification. Carefully analyze the provided plant image, examining leaf shape, color, texture, growth pattern, flowers, fruits, bark, and any distinctive features. Provide comprehensive identification with detailed botanical information. Return the response as JSON with fields: plantName (specific common name), scientificName (Latin binomial), plantType (e.g., succulent, flowering plant, fern, tree, shrub), family (botanical family), origin (native region), suitableEnvironment (detailed climate, light, temperature requirements), careInstructions (specific watering, soil, fertilizing, pruning needs), growthHabit (size, shape, growth pattern), floweringSeason (when it blooms), toxicity (if poisonous to humans/pets), uses (medicinal, culinary, ornamental), propagation (how to propagate), commonProblems (pests, diseases, issues), and confidence (0-100)."
           },
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Carefully examine this specific plant image. Look at the unique characteristics: leaf shape, color, patterns, texture, size, growth habit, and any visible flowers, fruits, or distinctive features. Identify this exact plant species and provide detailed, specific information about this particular plant. Do not give generic information - focus on what you actually see in this image."
+                text: "Carefully examine this specific plant image. Analyze all visible characteristics: leaf shape, size, color, texture, arrangement, margins, veins, growth pattern, stem/bark appearance, flowers, fruits, and any distinctive features. Identify this exact plant species and provide comprehensive botanical information including its family, origin, growth habits, care requirements, flowering season, toxicity, uses, propagation methods, and common problems. Be specific and detailed - focus on what you actually observe in this image."
               },
               {
                 type: "image_url",
@@ -87,8 +87,16 @@ serve(async (req) => {
           plantName: "Unknown Plant",
           scientificName: "N/A",
           plantType: "Unable to identify",
+          family: "Unknown",
+          origin: "Unknown",
           suitableEnvironment: aiResponse,
           careInstructions: "Please consult a local botanist for accurate care instructions.",
+          growthHabit: "Unknown",
+          floweringSeason: "Unknown",
+          toxicity: "Unknown",
+          uses: "Unknown",
+          propagation: "Unknown",
+          commonProblems: "Unknown",
           confidence: 50
         };
       }
@@ -97,8 +105,16 @@ serve(async (req) => {
         plantName: "Identification Error",
         scientificName: "N/A",
         plantType: "Analysis incomplete",
+        family: "Unknown",
+        origin: "Unknown",
         suitableEnvironment: aiResponse || "Unable to analyze image",
         careInstructions: "Please try again with a clearer image.",
+        growthHabit: "Unknown",
+        floweringSeason: "Unknown",
+        toxicity: "Unknown",
+        uses: "Unknown",
+        propagation: "Unknown",
+        commonProblems: "Unknown",
         confidence: 0
       };
     }
