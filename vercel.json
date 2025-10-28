@@ -4,9 +4,6 @@
   "outputDirectory": "dist",
   "framework": "vite",
   "installCommand": "npm install",
-  "env": {
-    "VERCEL": "1"
-  },
   "rewrites": [
     {
       "source": "/(.*)",
