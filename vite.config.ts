@@ -4,7 +4,7 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/AgriSense/' : '/',
+  base: process.env.VERCEL ? '/' : (mode === 'production' ? '/AgriSense/' : '/'),
   server: {
     host: "::",
     port: 8080,
